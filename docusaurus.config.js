@@ -7,13 +7,13 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
   module.exports = {
     title: 'Clean Code',
     tagline: '클린코드 완독하기 프로젝트',
-    url: 'https://..com',
+    url: 'https://..com', // TODO 수정 필요
     baseUrl: '/',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
     favicon: 'img/favicon.ico',
-    organizationName: 'scope', // Usually your GitHub org/user name.
-    projectName: 'cleancode', // Usually your repo name.
+    organizationName: 'scope-team', // Usually your GitHub org/user name.
+    projectName: 'clean-code', // Usually your repo name.
 
     presets: [
       [
@@ -22,7 +22,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
         ({
           docs: {
             sidebarPath: require.resolve('./sidebars.js'),
-            editUrl: 'https://github.com/scope-team/clean-code',
+            editUrl: 'https://github.dev/scope-team/clean-code/blob/main',
           },
           blog: {
             showReadingTime: true,
