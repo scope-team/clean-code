@@ -7,8 +7,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
   module.exports = {
     title: 'Clean Code',
     tagline: '클린코드 완독하기 프로젝트',
-    url: 'https://..com', // TODO 수정 필요
-    baseUrl: '/',
+    url: 'https://scope-team.github.io',
+    baseUrl: '/clean-code/',
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
     favicon: 'img/favicon.ico',
