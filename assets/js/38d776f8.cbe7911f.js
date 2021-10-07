@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkclean_code=self.webpackChunkclean_code||[]).push([[290],{3093:function(e){e.exports=JSON.parse('{"allTagsPath":"/clean-code/blog/tags","slug":"/clean-code/blog/tags/introduce","name":"introduce","count":1,"permalink":"/clean-code/blog/tags/introduce"}')}}]);

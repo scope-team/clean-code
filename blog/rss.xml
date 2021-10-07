@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>Clean Code Blog</title>
+        <link>https://scope-team.github.io/clean-code/blog</link>
+        <description>Clean Code Blog</description>
+        <lastBuildDate>Sat, 02 Oct 2021 00:00:00 GMT</lastBuildDate>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <generator>https://github.com/jpmonette/feed</generator>
+        <item>
+            <title><![CDATA[Member]]></title>
+            <link>https://scope-team.github.io/clean-code/blog/member</link>
+            <guid>member</guid>
+            <pubDate>Sat, 02 Oct 2021 00:00:00 GMT</pubDate>
+        </item>
+        <item>
+            <title><![CDATA[MDX Blog Post 작성하기]]></title>
+            <link>https://scope-team.github.io/clean-code/blog/mdx-blog-post</link>
+            <guid>mdx-blog-post</guid>
+            <pubDate>Fri, 01 Oct 2021 00:00:00 GMT</pubDate>
+            <description><![CDATA[Blog posts support Docusaurus Markdown features, such as MDX.]]></description>
+        </item>
+    </channel>
+</rss>

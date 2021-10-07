@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkclean_code=self.webpackChunkclean_code||[]).push([[787],{2658:function(e){e.exports=JSON.parse('{"allTagsPath":"/clean-code/blog/tags","slug":"/clean-code/blog/tags/member","name":"member","count":1,"permalink":"/clean-code/blog/tags/member"}')}}]);
