@@ -12,7 +12,7 @@
 21년 9월 26일 ~ 12월 5일 (약 10주간)
 
 ## 사이트
-- 주소: `추후 기재` (Docusaurus를 기반으로 제작하였습니다.)
+- 주소: [https://scope-team.github.io/clean-code/](https://scope-team.github.io/clean-code/) (Docusaurus를 기반으로 제작하였습니다.)
 
 
 ### Installation
