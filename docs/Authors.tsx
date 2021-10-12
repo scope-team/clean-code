@@ -14,7 +14,7 @@ const AUTHORS = {
     url: 'https://github.com/Xednicoder',
     image_url: 'https://github.com/Xednicoder.png',
   },
-  gyuseokdev: {
+  'gyuseok-dev': {
     name: 'gyuseok-dev',
     title: 'Back End Engineer',
     url: 'https://github.com/gyuseok-dev',
@@ -28,7 +28,7 @@ const AUTHORS = {
   },
 };
 
-type TAuthor = 'positiveko' | 'Xednicoder' | 'gyuseokdev' | 'shinyeong';
+type TAuthor = 'positiveko' | 'Xednicoder' | 'gyuseok-dev' | 'shinyeong';
 
 interface IAuthors {
   bookLeader: TAuthor;
