@@ -39,36 +39,39 @@ export default function Authors({
   bookLeader,
   authors,
 }: IAuthors): JSX.Element {
-  const renderAuthor = useCallback((): JSX.Element => {
+  const Author = ({ author }: { author: TAuthor }): JSX.Element => {
+    const authorInfo = AUTHORS[author];
+
+    return (
+      <div className={styles.author}>
+        <a
+          href={authorInfo.url}
+          target='_blank'
+          rel='noopener noreferrer'
+          className={styles.avatar__link}>
+          <img
+            src={authorInfo.image_url}
+            alt={author}
+            className={styles.avatar__photo}
+          />
+        </a>
+        <div className={styles.avatar__info}>
+          <span className={styles.bold}>
+            {authorInfo.name} {author === bookLeader && ` 🏆`}
+          </span>
+          <span>{authorInfo.title}</span>
+        </div>
+      </div>
+    );
+  };
+
+  const renderAuthors = useCallback((): JSX.Element => {
     return (
       <div className={styles.authors}>
-        {Object.entries(AUTHORS).map(([author, info]) => {
-          if (
-            author === bookLeader ||
-            (authors && authors.includes(author as TAuthor))
-          ) {
-            return (
-              <div className={styles.author} key={author}>
-                <a
-                  href={info.url}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className={styles.avatar__link}>
-                  <img
-                    src={info.image_url}
-                    alt={author}
-                    className={styles.avatar__photo}
-                  />
-                </a>
-                <div className={styles.avatar__info}>
-                  <span className={styles.bold}>
-                    {info.name}
-                    {author === bookLeader && ` 🏆`}
-                  </span>
-                  <span>{info.title}</span>
-                </div>
-              </div>
-            );
+        {AUTHORS[bookLeader] && <Author author={bookLeader} />}
+        {authors && authors.map((author) => {
+          if (AUTHORS[author]) {
+            return <Author author={author} key={author} />;
           }
         })}
       </div>
@@ -78,7 +81,7 @@ export default function Authors({
   return (
     <section>
       <span className={styles.title}>written by</span>
-      {renderAuthor()}
+      {renderAuthors()}
     </section>
   );
 }
