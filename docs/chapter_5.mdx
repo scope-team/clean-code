@@ -7,3 +7,165 @@ import Authors from './Authors.tsx';
 # 5장 형식 맞추기
 
 <Authors bookLeader='gyuseok-dev' />
+
+# 형식을 맞추는 목적
+
+- 코드 형식은 첫 인상
+- 원래 코드는 사라질지라도 개발자의 스타일과 규율은 사라지지 않는다.
+
+# 적절한 행 길이를 유지하라
+
+> 500줄을 넘지 않고 대부분 200줄 정도인 파일로도 커다란 시스템을 구축할 수 있다.
+> 
+- 반드시 지킬 엄격한 규칙은 아니지만 바람직한 규칙으로 삼으면 좋겠다.
+- 일반적으로 큰 파일보다 작은 파일이 이해하기 쉽다.
+
+## 신문기사 처럼 작성하라
+
+- 위로 갈수록 고차원 함수(큰 개념), 아래로 갈수록 저차원 함수(세부 개념)
+
+## 개념은 빈행으로 구분하라
+
+> 줄바꿈은 개념을 분리를 의미한다.
+> 
+- bad
+    
+    ```tsx
+    class Square implements Shape {
+        topLeft: Point
+        side: number
+        area() {
+            return this.side * this.side
+        }
+    }
+    ```
+    
+- good
+    
+    ```tsx
+    class Square implements Shape {
+        topLeft: Point
+        side: number
+        
+    		area() {
+            return this.side * this.side
+        }
+    }
+    ```
+    
+- 대부분 우리가 잘 지키고 있는 내용이지 다시 한번 중요성을 생각해보자.
+
+## 수직거리
+
+- 같은 파이에 속할 정도로 밀접한 두 개념은 세로 거리로 연관성을 표현한다.
+
+### **변수선언**
+
+- 변수는 사용하는 위치에 최대한 가까이 선언한다.
+    - bad
+    
+    ```tsx
+    function active() {
+        const a = 1
+        const b = 2
+        setA(a)
+    		//...
+        setB(b)
+    }
+    ```
+    
+    - good
+    
+    ```tsx
+    function active() {
+        const a = 1
+        setA(a)
+    		// ...
+        const b = 2
+        setB(b)
+    }
+    ```
+    
+
+### 인스턴스 변수
+
+- 인스턴스 변수는 클래스 맨 처음에 선언한다.
+
+### 종속 함수
+
+- 한 함수가 다른 함수를 호출 한다면 두함수는 세로로 가까이 배치한다.
+    
+    ```tsx
+    class Responder {
+        makeResponse() {
+            getPageNameOrDefault()
+            loadPage()
+            ...
+        }
+    
+        getPageNameOrDefault() {
+            ...
+        }
+    
+        loadPage() {
+            ...
+        }
+    
+    }
+    ```
+    
+
+# 가로 형식 맟추기
+
+> 프로그래머는 명백하게 짧은 행을 선호한다.
+> 
+
+## 가로공백과 밀집도
+
+> 밀접한 개념은 가까이, 느슨한 개념은 멀리
+> 
+
+```tsx
+function measureLine (line: str) {
+    lineCount++;
+    const lineSize = line.length()
+    // 멀리, 두가지 개념 요소가 확실히 나뉜다
+		totalChars += lineSize 
+    // 가까이, 함수와 인수는 서로 밀접하다.
+    lineWidthHistogram.addLine(lineSizem, lineCount)
+    recordWidestLine(lineSize)    
+}
+```
+
+## 수식
+
+```tsx
+return b*b - 4*a*c //곱셈이 우선순위가 높기 때문에 가까지한다.
+```
+
+## 들여쓰기
+
+> 범위로 이뤄진 계층을 표현하기 위해 우리는 코드를 들여쓴다.
+> 
+- 들여쓰기가 없다면, 인간이 코드를 읽기란 거의 불가능하리라.
+- 들여쓰기를 무시할 정도의 짧은 코드라도 들여쓰기로 범위를 표현하자
+    - bad
+    
+    ```tsx
+    function bad() {isGoodChoice = False}
+    ```
+    
+    - good
+    
+    ```tsx
+    function good() {
+       isGoodChoice = True
+    }
+    ```
+    
+
+# 팀 규칙
+
+- 팀은 한 가지 규칙에 합의해야 한다.
+- 모든 팀원은 그 규칙을 따라야한다.
+- Why? 한 소스 파일에서 봤던 형식이 다른 소스 파일에도 쓰이리라는 신뢰감을 독자에게 줘야한다.
