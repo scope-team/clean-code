@@ -7,3 +7,251 @@ import Authors from './Authors.tsx';
 # 6장 객체와 자료 구조
 
 <Authors bookLeader='gyuseok-dev' />
+
+# 자료추상화
+
+> 감추고 드러내라. 뭐래.. -장규석-
+> 
+
+## 왜 구현을 감춰야되냐?
+
+- 충동이든 변덕이든, 변수 타입이나 구현을 맘대로 바꾸고 싶어서다.
+
+```tsx
+// 구체적인 클래스
+class Point {
+	x: number
+	y: number
+}
+
+// 추상적인 클래스
+interface Point {
+	getX()
+	getY()
+	setCartesian(x: number, y: number)
+}
+
+/*
+ 구체적인 클래스는 각 인스턴스를 전부 따로 다뤄야한다.
+ 추상적인 클래스는 x, y 인스턴스를 읽어올때는 따로 읽어오지만,
+ 설정할 때는 두값을 한꺼번에 설정해야한다.
+*/
+```
+
+## 구현을 감추려면 **추상화**가 필요하다.
+
+- bad
+    
+    ```tsx
+    interface Vehicle {
+        getFuelTankCapacityInGallons()
+        getGallonsOfGasoline()
+    }
+    // 이러면 객체에는 가솔린 차량 밖에 쓰지 못한다. 전기는? 수소는? 디젤은? 응???
+    ```
+    
+- good
+    
+    ```tsx
+    interface Vehicle {
+        getPercentFuelRemaining()
+    }
+    // 추상적으로 표현하면 가솔린이든 디젤이든 동일한 인터페이스로 표현할 수 있다.
+    ```
+    
+- 아무 생각 없이 조회/설정 함수를 추가하는 방법이 **가장 나쁘다**.
+
+# 자료/객체 비대칭
+
+## 절차적인 코드
+
+- 새 함수를 추가하는 것이 쉽다.
+- 새 클래스를 추가하기 위해서는 모든 함수를 수정해야한다.
+
+```tsx
+interface Point = {
+	  x: number
+	  y: number
+}
+
+class Square {
+    topLeft: Point
+    side: number
+}
+
+class Rectangle {
+    topLeft: Point
+    height: number
+    width: number
+}
+
+class Circle {
+    center: Point
+    radius: number
+}
+
+class Geometry {
+    const PI = 3.14
+
+    area(shape: object) {
+        if (shape instanceof Square) {
+            return shape.side * shape.side
+        }
+        else if (shape instanceof Rectangle) {
+            return shape.height * shape.width
+        }
+        else if (shape instanceof Circle) {
+            return this.PI * shape.radius * shape.radius
+        }
+    } 
+}
+
+// usage
+s = new Square(...)
+g = new Geometry(...)
+return g.area(s)
+
+// 여기에 다른 도형이 추가되면 Geometry의 모든 함수를 수정해야한다.
+```
+
+## 객체지향 코드
+
+- 새 클래스를 추가하는 것이 쉽다.
+- 새 함수를 추가하기 위해서는 모든 클래스를 고쳐야한다.
+
+```tsx
+interface Point {
+    x: number
+    y: number
+}
+
+interface Shape {
+    area(): number
+}
+
+class Square implements Shape {
+    topLeft: Point
+    side: number
+
+    area() {
+        return this.side * this.side
+    }
+
+}
+
+class Rectangle implements Shape {
+    topLeft: Point
+    height: number
+    width: number
+
+    area() {
+        return this.height * this.width
+    }
+}
+
+class Rectangle implements Shape {
+    topLeft: Point
+    height: number
+    width: number
+
+    area() {
+        return this.height * this.width
+    }
+}
+
+class Circle implements Shape {
+    center: Point
+    redius: number
+    const PI = 3.14
+
+    area() {
+        return this.PI * this.redius * this.redius
+    }
+}
+// 여기에 새로운 함수를 추가하려면 모든 클래스를 고쳐야한다!
+```
+
+- 모든 것이 객체라는 생각은 **미신**이다.
+- 상황 맞게 절차지향 코드와 객체지향 코드를 적절히 사용해야 한다.
+
+# 디미터 법칙
+
+- 모듈은 자신이 조작하는 객체의 속사정을 몰라야 한다는 법칙
+- 클래스의 메서드가 반환하는 객체의 메서드는 호출하면 안된다!
+    - bad
+        
+        ```tsx
+        const outputDir = ctxt.getOptions().getScratchDir().getAbsolutePath()
+        // 위와 같은 코드를 기차충돌(train wreck)이라 부른다.
+        // ctxt에서 너무 많은 자료를 공개해버린다.
+        ```
+        
+    - good
+        
+        ```tsx
+        const opts = ctxt.getOptions()
+        const scratchDir = opts.getScratchDir()
+        const outputDir = scratchDir.getAbsolutePath() 
+        ```
+        
+
+# 자료 전달 객체(DTO)
+
+- 외부 애플리케이션(데이터베이스, 외부 API 등)에서 가공되지 않은 정보를 내부 코드에서 사용할 객체로 변환하는 단계에서 가장 처음으로 사용하는 구조이다.
+    
+    ```tsx
+    class UserDto {
+        name: string
+        email: string
+        password: string
+    }
+    ```
+    
+
+## 빈(bean) 구조 (bad)
+
+- 그저 비공개(private) 변수에 조회/설정 함수로 조작한다.
+- 일종의 사이비 캡슐화로 별다른 이익을 주진 않는다.
+
+```tsx
+class Address {
+    private street: string
+    private city: string
+    private state: string
+    private zip: string
+
+    constructor(street: string, city: string, state: string, zip: string) {
+        this.street = street
+        this.city = city
+        this.state = state
+        this.zip = zip
+    };
+    getStreet() {
+        return this.street
+    }
+    getCity() {
+        return this.city
+    }
+    getState() {
+        return this.state
+    }
+    getZip() {
+        return this.zip
+    }
+}
+```
+
+## 활성 레코드
+
+- DTO의 특수한 형태
+- save나 find 같은 추가적인 함수를 제공
+- 비즈니스 규칙 메서드를 추가하면 안된다.
+- MVC 패턴
+
+# 결론
+
+> 객체는 동작을 공개하고 자료를 숨긴다.
+> 
+- 새로운 자료 타입(컴포넌트)를 추가하는 유연성이 필요하면, 객체지향(프론트)
+- 새로운 동작(메소드)을 추가 유연성이 필요하면, 자료구조 + 절차지향(백엔드)
+- 우수한 개발자은 편견없이 이 사실을 이해해 직면한 문제에 최적인 해결책을 선택한다.
