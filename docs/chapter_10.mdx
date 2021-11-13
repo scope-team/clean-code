@@ -2,8 +2,311 @@
 sidebar_position: 10
 ---
 
-import Authors from './Authors.tsx';
+import Authors from "./Authors.tsx";
 
 # 10장 클래스
 
-<Authors bookLeader='shinyeong' />
+<Authors bookLeader="shinyeong" />
+
+코드의 표현력과 그 코드로 이루어진 함수에 아무리 신경 쓸지라도 좀 더 차원 높은 단계까지 신경 쓰지 않으면 깨끗한 코드를 얻기는 어렵다.
+
+## 클래스 체계
+
+클래스는 데이터와 메소드가 합쳐진 것으로 정적 공개 상수, 정적 비공개 상수, 비공개 인스턴스 변수, 공개 함수 등의 순서로 추상화 단계가 순차적으로 내려간다.
+그래서 프로그램은 신문기사처럼 읽힐 수 있는 것이다.
+
+## 클래스는 작아야 한다!
+
+클래스를 만들 때 첫 번째 규칙, 두번째 규칙은 '클래스는 작야아 한다'는 것이다.
+이는 함수의 규칙과 같다. 함수는 '물리적인 행 수'로 크기를 측정했다면, 클래스는 '맡은 책임'을 척도로 한다.
+
+```tsx
+class SuperDashboard {
+  getLastFocusComponent(): void {
+    /* ... */
+  }
+  setLastFocused(): void {
+    /* ... */
+  }
+  getMajorVersionNumber(): string {
+    /* ... */
+  }
+  getMinorVersionNumber(): string {
+    /* ... */
+  }
+  getBuildNumber(): string {
+    /* ... */
+  }
+}
+```
+
+SuperDashboard 클래스는 매서드 다섯 개 정도 있으니 괜찮지 않은가?
+그렇지 않다. SuperDashboard 클래스는 메서드 수가 작음에도 불구하고 `책임`이 너무 많다.
+
+클래스의 이름은 해당 클래스 책임을 기술해야 한다. 간결한 이름이 떠오르지 않는다면 필경 클래스 크기가 너무 커서 그렇다.
+즉, 클래스에다 여러 책임을 떠안겼다는 증거다.
+
+### 단일 책임 원칙 (Single Responsibility Principle, SRP)
+
+단일 책임 원칙은 클래스나 모듈을 변경할 이유가 하나 뿐이어야 한다는 원칙이다.
+SRP는 `책임` 이라는 개념을 정의하며 적절한 클래스 크기를 제시한다.
+
+- SuperDashboard 클래스는 소프트웨어 버전 정보를 추적한다.
+- SuperDashboard 클래스는 자바스윙 컴포넌트를 관리한다.
+
+해당 클래스의 `책임`을 파악하려 애쓰다 보면 코드를 추상화하기도 쉬워진다.
+즉, SuperDashboard에서 버전 정보를 다루는 메서드 3개를 따로 빼내 Version이라는 독자적인 클래스를 만들어 줄 수 있다.
+
+```tsx
+class Version {
+  getMajorVersionNumber(): string {
+    /* ... */
+  }
+  getMinorVersionNumber(): string {
+    /* ... */
+  }
+  getBuildNumber(): string {
+    /* ... */
+  }
+}
+```
+
+위와 같이 SRP 원칙을 고수하는 이유는 아래의 이유와 같다.
+
+```
+도구 상자를 어떻게 관리하고 싶은가? 작은 서랍을 많이 두고 기능과 이름이 명확한 컴포넌트를 나눠 넣고 싶은가? 아니면 큰 서랍 몇 개를 두고 모두를 던져 넣고 싶은가?`
+```
+
+즉, `큰 클래스 몇 개가 아니라 작은 클래스 여럿으로 이뤄진 시스템이 더 바람직하다`
+
+### 높은 응집도 (Cohesion)
+
+응집도가 높다는 말은 클래스에 속한 메서드와 변수가 서로 의존하며 논리적인 단위로 묶인 다는 의미이다.
+즉, 모든 인스턴스 변수를 메서드마다 사용하는 클래스는 응집도가 가장 높다.
+
+- '함수를 작게, 매개변수 목록을 짧게' 라는 전략을 따르다보면 때떄로 몇몇 메서드만이 사용하는 인스턴스 변수가 아주 많아진다.
+- 이는 십중팔구 새로운 클래스로 쪼개야 한다는 신호다. 응집도가 높아지도록 적절히 분리해야 한다.
+- 클래스가 응집력을 잃는다면 작은 클래스 여러 개로 클래스를 쪼개야 한다.
+- 먼저, 큰 함수를 작은 함수 여럿으로 쪼개다 보면, 종종 작은 클래스 여럿으로 쪼갤 기회가 생긴다.
+
+```tsx
+// 응집도가 높은 클래스
+class Stack {
+  let topOfStack: number = 0;
+  let elements: number[] = new LinkedList();
+
+  size(): number {
+    return topOfStack;
+  }
+
+  push(element: number): void {
+    topOfStack++;
+    elements.add(element);
+  }
+
+  pop(): number {
+    if (topOfStack == 0) {
+      throw new PoppendWhenEmpty();
+    }
+    element: number = elements.get(--topOfStack);
+    elements.remove(topOfStack);
+    return element;
+  }
+}
+```
+
+```tsx
+// 응집도가 낮은 class
+class UserManager {
+  // Bad: 각 private 변수는 메소드의 하나 혹은 또 다른 그룹에 의해 사용됩니다.
+  // 클래스가 단일 책임 이상의 책임을 가지고 있다는 명백한 증거입니다.
+  // 사용자의 트랜잭션을 얻기 위해 서비스를 생성하기만 하면 되는 경우,
+  // 여전히 `emailSender` 인스턴스를 전달해야 합니다.
+  constructor(
+    private readonly db: Database,
+    private readonly emailSender: EmailSender
+  ) {}
+
+  async getUser(id: number): Promise<User> {
+    return await db.users.findOne({ id });
+  }
+
+  async getTransactions(userId: number): Promise<Transaction[]> {
+    return await db.transactions.find({ userId });
+  }
+
+  async sendGreeting(): Promise<void> {
+    await emailSender.send("Welcome!");
+  }
+
+  async sendNotification(text: string): Promise<void> {
+    await emailSender.send(text);
+  }
+
+  async sendNewsletter(): Promise<void> {
+    // ...
+  }
+}
+```
+
+```tsx
+// 응집도가 높은 class
+class UserService {
+  constructor(private readonly db: Database) {}
+
+  async getUser(id: number): Promise<User> {
+    return await this.db.users.findOne({ id });
+  }
+
+  async getTransactions(userId: number): Promise<Transaction[]> {
+    return await this.db.transactions.find({ userId });
+  }
+}
+
+class UserNotifier {
+  constructor(private readonly emailSender: EmailSender) {}
+
+  async sendGreeting(): Promise<void> {
+    await this.emailSender.send("Welcome!");
+  }
+
+  async sendNotification(text: string): Promise<void> {
+    await this.emailSender.send(text);
+  }
+
+  async sendNewsletter(): Promise<void> {
+    // ...
+  }
+}
+```
+
+### 낮은 결합도
+
+- 깨끗한 시스템은 클래스를 체계적으로 정리해 변경에 수반하는 위험을 낮춘다.
+- 결합도는 두 클래스가 얼마나 서로에게 관련되어있거나 종속적인 정도를 뜻한다. 하나의 클래스의 변경이 다른 클래스에게 영향을 주지 않는다면 그 클래스들의 결합도는 낮다고 말한다
+- 좋은 소프트웨어 설계는 `높은 응집도와 낮은 결합도`를 가진다.
+
+아래 코드는 SQL 문자열을 만드는 Sql 클래스이다. 아직은 미완성이라 update문을 지원할 시점이 오면 클래스에 '손대어' 고쳐야 한다.
+문제는 어떤 변경읻ㄴ 클래스에 손을 대면 다른 코드를 망가뜨릴 잠정적인 위험이 존재하며 테스트도 완전히 다시 해야한다.
+
+```tsx
+// 높은 결합도
+
+class AjaxAdapter extends Adapter {
+  constructor() {
+    super();
+  }
+
+  // ...
+}
+
+class NodeAdapter extends Adapter {
+  constructor() {
+    super();
+  }
+
+  // ...
+}
+
+class HttpRequester {
+  constructor(private readonly adapter: Adapter) {}
+
+  async fetch<T>(url: string): Promise<T> {
+    if (this.adapter instanceof AjaxAdapter) {
+      const response = await makeAjaxCall<T>(url);
+      // response 값을 변경하고 반환합니다.
+    } else if (this.adapter instanceof NodeAdapter) {
+      const response = await makeHttpCall<T>(url);
+      // response 값을 변경하고 반환합니다.
+    }
+  }
+}
+
+function makeAjaxCall<T>(url: string): Promise<T> {
+  // 서버에 요청하고 프로미스를 반환합니다.
+}
+
+function makeHttpCall<T>(url: string): Promise<T> {
+  // 서버에 요청하고 프로미스를 반환합니다.
+}
+```
+
+```tsx
+// 낮은 결합도
+
+abstract class Adapter {
+  abstract async request<T>(url: string): Promise<T>;
+
+  // 하위 클래스와 공유하는 코드 ...
+}
+
+class AjaxAdapter extends Adapter {
+  constructor() {
+    super();
+  }
+
+  async request<T>(url: string): Promise<T> {
+    // 서버에 요청하고 프로미스를 반환합니다.
+  }
+
+  // ...
+}
+
+class NodeAdapter extends Adapter {
+  constructor() {
+    super();
+  }
+
+  async request<T>(url: string): Promise<T> {
+    // 서버에 요청하고 프로미스를 반환합니다.
+  }
+
+  // ...
+}
+
+class HttpRequester {
+  constructor(private readonly adapter: Adapter) {}
+
+  async fetch<T>(url: string): Promise<T> {
+    const response = await this.adapter.request<T>(url);
+    // response 값을 변경하고 반환합니다.
+  }
+}
+```
+
+## SOLID
+
+- 객체지향 프로그래밍을 할 때 기본적으로 이해해야 하는 원리들입니다.
+
+### SRP (Single Responsibillity Principle)
+
+- 클래스는 하나의 역할만 해야 한다
+- 다양한 일을 할 수 있는 만능의 클래스를 만드는 것은 한가지 역할을 하는 클래스보다 좋지 않다
+- 변경을 할 가능성이 높고 좋지 않은 영향을 받을 가능성도 높음
+- 복잡한 자료구조와 메서드를 가질 가능성이 높으며 사용하기 어려울 가능성이 높음
+- 명확히 정의된 하나의 구체적인 역할을 줄 수 있다면 SRP를 만족한다고 할 수 있다.
+
+### OCP (Open Close Principle)
+
+- 확장에 대해서는 열려있고, 변경에 대해서는 닫혀있게 만들어야 한다.
+- 즉 새로운 기능 추가는 쉽지만 변경의 영향이 제한적이여야 한다.
+- 기존의 코드를 변경하지 않고 새로운 기능을 추가할 수 있도록 하는 것이다.
+
+### LSP (Liskov Substitution Principle)
+
+- 같은 형을 가지는 객체로 대체되어 사용할 수 있어야 한다.
+- 동일한 클래스를 상속하는 경우, 상위 클래스를 접근하는 Client 코드들은 상속받은 클래스로 대체하더라도 변경이 없어야 한다.
+
+### ISP (Interface Segregation Principle)
+
+- 필요한 인터페이스 각각에 대해서 따로 정의해서 사용하는 것이 좋다.
+- 즉, 각각의 인터페이스를 공용화해서 한 인터페이스가 너무 많은 기능을 제공하도록 만드는 것은 확장성 및 변경의 영향을 제어하지 못하게 만든다.
+- "클라이언트는 사용하지 않는 인터페이스에 의존하지 않는다"
+- 만능보다는 한가지 일에 특화된 것이 좋다.
+
+### DIP (Dependency Inversion Principle)
+
+- 구체적인 것에 의존하지 말라
+- 상위 레벨의 모듈은 하위 레벨의 모듈에 의존하지 않아야 한다. 두 모듈은 모두 추상화에 의존해야한다.
+- 추상화는 세부사항에 의존하지 않아야 한다. 세부사항은 추상화에 의존해야 한다.
+- 이를 통한 장점은 모듈 사이의 결합도를 줄일 수 있다는 것이다.
