@@ -6,4 +6,182 @@ import Authors from './Authors.tsx';
 
 # 12장 창발성
 
-<Authors bookLeader='shinyeong' />
+<Authors bookLeader='positiveko' />
+
+# 창발적 설계로 깔끔한 코드를 구현하자
+
+우수한 설계를 짤 수 있고, 코드 구조와 설계를 파악하기 쉽게 코드를 작성하려면 어떻게 해야할까?
+[SRP(단일 책임 원칙 - Single Responsibility Principle)](https://ko.wikipedia.org/wiki/%EB%8B%A8%EC%9D%BC_%EC%B1%85%EC%9E%84_%EC%9B%90%EC%B9%99)나 [DIP(의존 관계 역전 원칙 - Dependency Inversion Principle)](https://ko.wikipedia.org/wiki/%EC%9D%98%EC%A1%B4%EA%B4%80%EA%B3%84_%EC%97%AD%EC%A0%84_%EC%9B%90%EC%B9%99)와 같은 원칙을 쉽게 적용할 수 있도록 하는 규칙이 있을까?
+켄트 벡이 제안한 단순한 설계 규칙 4가지를 따르면 우수한 설계의 창발성을 촉진할 수 있다.
+
+- 모든 테스트를 실행한다
+- 중복을 없앤다
+- 프로그래머 의도를 표현한다.
+- 클래스와 메서드 수를 최소로 줄인다.
+
+위 목록은 중요도 순이다.
+
+# 단순한 설계 규칙 1: 모든 테스트를 실행하라
+
+무엇보다 먼저, 설계는 의도한 대로 돌아가는 시스템을 내놓아야 한다. 
+시스템이 의도한 대로 돌아가는지 검증하려면 시스템이 테스트가 가능해야 한다.
+
+다행스럽게도, 테스트가 가능한 시스템을 만들려고 애쓰면 설계 품질이 더불어 높아진다. 
+SRP를 준수하는 클래스는 테스트가 훨씬 더 쉽다. 테스트 케이스가 많을수록 개발자는 테스트가 쉽게 코드를 작성한다.
+따라서 철저한 테스트가 가능한 시스템을 만들면 더 나은 설계가 가능해진다.
+
+결합도가 높으면 테스트 케이스를 작성하기 어렵다. 따라서 테스트 케이스를 많이 작성할수록 개발자는 DIP와 같은 원칙을 적용하고
+의존성 주입(Dependency Injection), 인터페이스, 추상화 등과 같은 도구를 사용해 결합도를 낮춘다. 따라서 설계 품질은 더욱 높아진다.
+
+결과적으로 테스트 케이스를 만들고 계속 돌려라라는 간단한 규칙을 따르면 시스템은 낮은 결합도와 높은 응집력이라는, 객체 지향 방법론이 지향하는 목표를 저절로 달성한다.
+즉, 테스트 케이스를 작성하면 설계 품질이 높아진다.
+
+
+# 단순한 설계 규칙 2~4: 리팩터링
+
+테스트 케이스를 작성한 후에는 코드와 클래스를 점진적으로 리팩터링한다. 
+테이스트 케이스가 있으니 코드를 리팩터링하면서 시스템이 깨질까 걱정할 필요가 없다.
+
+리팩터링 단계에서는 스프트웨어 설계 품질을 높일 수 있도록 다양한 기법을 적용한다.
+응집도를 높이고, 결합도를 낮추고, 관심사를 분리하고, 시스템 관심사를 모듈로 나누고, 함수와 클래스 크기를 줄이고, 더 나은 이름을 선택하는 등 다양한 기법을 적용한다.
+그리고 <u>1) 중복을 제거하고</u>, <u>2) 프로그래머 의도를 표현하고</u>, <u>3) 클래스와 메서드 수를 최소로 줄인다.</u>
+
+# 1) 중복을 없애라
+
+우수한 설계에서 중복은 커다란 적이다.
+중복은 추가 작업, 추가 위험, 불필요한 복잡도를 뜻하기 때문이다.
+
+어떻게 중복을 줄일 수 있을까?
+똑같은 코드는 당연히 중복이다. 비슷한 코드는 더 비슷하게 고쳐주면 리팩터링이 쉬워진다.
+구현 중복도 중복의 한 형태다. 
+
+다음 예제를 살펴보자.
+
+```ts
+function scaleToOneDimension(desiredDimension: number, imageDimension: number) {
+  if (Math.abs(desiredDimension - imageDimension) < errorThreshold) return;
+  let scalingFactor = desiredDimension / imageDimension;
+  scalingFactor = Math.floor(scalingFactor * 100) * 0.01f;
+  
+  const newImage = ImageUtilities.getScaledImage(image, scalingFactor, scalingFactor);
+  image.dispose();
+  FileSystem.gc();
+  image = newImage;
+}
+
+function rotate(degrees: number) {
+  newImage = ImageUtilities.getRotatedImage(image, degrees);
+  image.dispose();
+  FileSystem.gc();
+  image = newImage;
+}
+```
+
+`scaleToOneDimension` 함수와 `rotate` 함수를 보면 일부 코드가 동일하게 들어가 있다.
+다음과 같이 코드를 정리해 중복을 제거한다.
+
+```ts
+function scaleToOneDimension(desiredDimension: number, imageDimension: number) {
+  if (Math.abs(desiredDimension - imageDimension) < errorThreshold) return;
+  let scalingFactor = desiredDimension / imageDimension;
+  scalingFactor = Math.floor(scalingFactor * 100) * 0.01f;
+  replaceImage(ImageUtilities.getScaledImage(image, scalingFactor, scalingFactor));
+}
+
+function rotate(degrees: number) {
+  replaceImage(ImageUtilities.getRotatedImage(ImageUtilities.getRotatedImage(image, degrees)));
+}
+
+function replaceImage(newImage: RenderedOp) {
+  image.dispose();
+  FileSystem.gc();
+  image = newImage;
+}
+```
+
+다음의 [TEMPLATE METHOD 패턴](https://ko.wikipedia.org/wiki/%ED%85%9C%ED%94%8C%EB%A6%BF_%EB%A9%94%EC%86%8C%EB%93%9C_%ED%8C%A8%ED%84%B4)을 살펴보자.
+고차원 중복을 제거할 목적으로 자주 사용하는 기법이다.
+
+```ts
+class VacationPolicy {
+  accrueUSDivisionVacation() {
+    // 지금까지 근무한 시간을 바탕으로 휴가 일수를 계산하는 코드
+    // 휴가 일수가 미국 최소 법정 일수를 만족하는지 확인하는 코드
+    // 휴가 일수를 급여 대장에 적용하는 코드
+  }
+
+  accrueEUDivisionVacation() {
+    // 지금까지 근무한 시간을 바탕으로 휴가 일수를 계산하는 코드
+    // 휴가 일수가 유럽연합 최소 법정 일수를 만족하는지 확인하는 코드
+    // 휴가 일수를 급여 대장에 적용하는 코드
+  }
+}
+```
+
+최소 법정 일수를 계산하는 코드만 제외하면 두 메서드는 동일하다.
+여기에 TEMPLATE METHOD 패턴을 적용해 중복을 제거한다.
+
+```ts
+// 추상 클래스(AbstractClass)에는 실제로 실행을 위해 호출될 public 메소드인 templateMethod를 정의한다.
+class VacationPolicy {
+  accrueVacation() {
+    calculatedBaseVacationHours();
+    alterForLegalMinimums();
+    applyToPayroll();
+  }
+
+  calculatedBaseVacationHours() { ... };
+  alterForLegalMinimums();
+  applyToPayroll() { ... };
+}
+
+// ConcreteClass는 AbstractClass를 상속받아 구체적인 구현을 정의한다.
+class USVacationPolicy extends VacationPolicy {
+  alterForLegalMinimums() {
+    // 미국 최소 법정 일수를 사용한다.
+  }
+}
+
+class EUVacationPolicy extends VacationPolicy {
+  alterForLegalMinimums() {
+    // 유럽연합 최소 법정 일수를 사용한다.
+  }
+}
+```
+
+하위 클래스는 중복되지 않는 정보만 제공해 accrueVacation 알고리즘에서 빠진 '구멍'을 메운다.
+
+# 2) 표현하라
+
+코드는 개발자의 의도를 분명히 표현해야 한다. 개발자가 코드를 명백하게 짤수록 다른 사람이 그 코드를 이해하기 쉬워진다.
+그래야 결함이 줄어들고 유지보수 비용이 적게 든다.
+
+### 첫째, 좋은 이름을 선택한다.
+이름과 기능이 완전히 딴판인 클래스나 함수로 유지보수 담당자를 혼란스럽게 하지 말자.
+
+### 둘째, 함수와 클래스 크기를 가능한 줄인다.
+작은 클래스와 작은 함수는 이름 짓기도 쉽고, 구현하기도 쉽고, 이해하기도 쉽다.
+
+### 셋째, 표준 명칭을 사용한다.
+클래스가 COMMAND나 VISITOR와 같은 표준 패턴을 사용해 구현한다면 클래스 이름에 패턴 이름을 넣어준다. 
+그러면 다른 개발자가 클래스 설계 의도를 이해하기 쉬워진다.
+
+### 넷째, 단위 테스트 케이스를 꼼꼼히 작성한다.
+테스트 케이스는 소위 '예제로 보여주는 문서'다. 따라서 잘 만든 테스트 케이스를 읽어보면 클래스 기능이 한눈에 들어온다.
+
+하지만 표현력을 높이는 가장 주요한 방법은 노력이다.
+다음에 유지보수할 사람을 배려해 조금이라도 읽기 쉽게 만드려는 노력을 하자.
+
+# 3) 클래스와 메서드 수를 최소로 줄여라
+
+중복을 제거하고, 의도를 표현하고, SRP를 준수한다는 기본적인 개념도 극단으로 치달으면 득보다 실이 많아진다.
+따라서 이 규칙은 함수와 클래스 수를 가능한 줄이라고 제안한다.
+
+목표는 함수와 클래스 크기를 작게 유지하면서 동시에 시스템 크기도 작게 유지하는 데 있다. 하지만 이 규칙은 간단한 설계 규칙 4개 중 가장 우선순위가 낮다.
+따라서 클래스와 함수 수를 줄이는 작업도 중요하지만, 테스트 케이스를 만들고 중복을 제거하고 의도를 표현하는 작업이 더 중요하다는 것을 잊지 말자.
+
+
+# 결론
+켄트 벡의 단순한 설계 규칙을 따르자.
+
+
