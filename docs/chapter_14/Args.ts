@@ -8,7 +8,7 @@ class Args {
     private args: string[];
     private valid = true;
     private unexpectedArguments = new Set<string>();
-    private booleanArgs = new Map<string, boolean>();
+    private booleanArgs = new Map<string, ArgumentMarshaler>();
     private stringArgs = new Map<string, string>();
     private argsFound = new Set<string>();
     private currentArgument: number;
@@ -71,7 +71,7 @@ class Args {
     }
 
     private parseBooleanSchemaElement(elementId: string) {
-        this.booleanArgs.set(elementId, false);
+        this.booleanArgs.set(elementId, new BooleanArgumentMarshaler());
     }
 
     private parseArguments() {
@@ -166,7 +166,7 @@ class Args {
     }
 
     public getBoolean(arg: string) {
-        return this.falseIfNull(this.booleanArgs.get(arg));
+        return this.falseIfNull(this.booleanArgs.get(arg).getBoolean());
     }
 
     private falseIfNull(b: boolean) {
@@ -182,4 +182,22 @@ class Args {
     }
 
 
+}
+
+class ArgumentMarshaler {
+    private booleanValue = false;
+
+    public setBoolean(value: boolean) {
+        this.booleanValue = value;
+    }
+
+    public getBoolean() {
+        return this.booleanValue;
+    }
+}
+
+class BooleanArgumentMarshaler extends ArgumentMarshaler {
+}
+
+class StringArgumentMarshaler extends ArgumentMarshaler {
 }
