@@ -1,19 +1,24 @@
+enum ErrorCode {
+    OK,
+    MISSING_STRING
+}
+
 class Args {
     private schema: string;
     private args: string[];
-    private valid = false;
+    private valid = true;
     private unexpectedArguments = new Set<string>();
     private booleanArgs = new Map<string, boolean>();
-    private numberOfArgument = 0;
+    private stringArgs = new Map<string, string>();
+    private argsFound = new Set<string>();
+    private currentArgument: number;
+    private errorArgument = "\0";
+    private errorCode = ErrorCode.OK;
 
     constructor(schema: string, args: string[]) {
         this.schema = schema;
         this.args = args;
         this.valid = this.parse();
-    }
-
-    public isValid() {
-        return this.valid;
     }
 
     private parse() {
@@ -35,23 +40,45 @@ class Args {
     }
 
     private parseSchemaElement(element: string) {
-        const c = element.charAt(0);
-        if (element.length === 1) {
-            this.parseBooleanSchemaElement(element);
+        const elementId = element.charAt(0);
+        const elementTail = element.substring(1);
+        this.validateSchemaElementId(elementId);
+        if (this.isBooleanSchemaElement(elementTail)) {
+            this.parseBooleanSchemaElement(elementId);
+        } else if (this.isStringSchemaElement(elementTail)) {
+            this.parseStringSchemaElement(elementId);
         }
     }
 
-    private parseBooleanSchemaElement(element: string) {
-        const c = element.charAt(0);
-        if (c.match(/[a-z]/i)) {
-            this.booleanArgs.set(c, false);
+    private validateSchemaElementId(elementId: string) {
+        if (!elementId.match(/[a-z]/i)) {
+            throw new Error(
+                "Bad character:" + elementId + "in Args format: " + this.schema
+            )
         }
+    }
+
+    private parseStringSchemaElement(elementId: string) {
+        this.stringArgs.set(elementId, "");
+    }
+
+    private isStringSchemaElement(elementTail: string) {
+        return elementTail === "*";
+    }
+
+    private isBooleanSchemaElement(elementTail: string) {
+        return elementTail.length === 0;
+    }
+
+    private parseBooleanSchemaElement(elementId: string) {
+        this.booleanArgs.set(elementId, false);
     }
 
     private parseArguments() {
-        this.args.forEach(arg => {
+        for (this.currentArgument = 0; this.currentArgument < this.args.length; this.currentArgument++) {
+            const arg = this.args[this.currentArgument];
             this.parseArgument(arg);
-        });
+        }
         return true;
     }
 
@@ -68,24 +95,46 @@ class Args {
     }
 
     private parseElement(argChar: string) {
-        if (this.isBoolean(argChar)) {
-            this.numberOfArgument++;
-            this.setBooleanArg(argChar, true);
+        if (this.setArgument(argChar)) {
+            this.argsFound.add(argChar);
         } else {
             this.unexpectedArguments.add(argChar);
+            this.valid = false;
         }
     }
 
-    public setBooleanArg(argChar: string, value: boolean) {
-        this.booleanArgs.set(argChar, value);
+    private setArgument(argChar: string) {
+        let set = true;
+        if (this.isBoolean(argChar)) {
+            this.setBooleanArg(argChar, true);
+        } else if (this.isString(argChar)) {
+            this.setStringArg(argChar, "");
+        } else {
+            set = false;
+        }
+        return set;
+    }
+
+    private isString(argChar: string) {
+        return this.stringArgs.has(argChar)
     }
 
     public isBoolean(argChar: string) {
         return this.booleanArgs.has(argChar);
     }
 
+    public setStringArg(argChar: string, s: string) {
+        this.currentArgument++;
+        this.stringArgs.set(argChar, this.args[this.currentArgument]);
+    }
+
+    public setBooleanArg(argChar: string, value: boolean) {
+        this.currentArgument++;
+        this.booleanArgs.set(argChar, this.args[this.currentArgument]);
+    }
+
     public cardinality() {
-        return this.numberOfArgument;
+        return this.argsFound.size;
     }
 
     public usage() {
@@ -96,8 +145,15 @@ class Args {
         if (this.unexpectedArguments.size > 0) {
             return this.unexpectedArgumentMessage();
         } else {
-            return "";
+            switch (this.errorCode) {
+                case ErrorCode.MISSING_STRING:
+                    return ("Could not find string parameter for " + this.errorArgument);
+                case ErrorCode.OK:
+                    throw new Error("TILT: Should not get here.");
+                default:
+            }
         }
+        return "";
     }
 
     private unexpectedArgumentMessage() {
@@ -110,6 +166,20 @@ class Args {
     }
 
     public getBoolean(arg: string) {
-        return this.booleanArgs.get(arg);
+        return this.falseIfNull(this.booleanArgs.get(arg));
     }
+
+    private falseIfNull(b: boolean) {
+        return b == null ? false : b;
+    }
+
+    public getString(arg: string) {
+        return this.stringArgs.get(arg) == null ? "" : this.stringArgs.get(arg);
+    }
+
+    public isValid() {
+        return this.valid;
+    }
+
+
 }
