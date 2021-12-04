@@ -129,7 +129,7 @@ class Args {
     }
 
     public setBooleanArg(argChar: string, value: boolean) {
-        this.booleanArgs.get(argChar).setBoolean(value);
+        this.booleanArgs.get(argChar).set("true");
     }
 
     public cardinality() {
@@ -181,8 +181,8 @@ class Args {
 
 }
 
-class ArgumentMarshaler {
-    private booleanValue = false;
+abstract class ArgumentMarshaler {
+    protected booleanValue = false;
     private stringValue: string;
 
     public setBoolean(value: boolean) {
@@ -200,9 +200,14 @@ class ArgumentMarshaler {
     public getString() {
         return this.stringValue == null ? "" : this.stringValue;
     }
+
+    public abstract set(s: string): void;
 }
 
 class BooleanArgumentMarshaler extends ArgumentMarshaler {
+    public set(s: string) {
+        this.booleanValue = true;
+    }
 }
 
 class StringArgumentMarshaler extends ArgumentMarshaler {
