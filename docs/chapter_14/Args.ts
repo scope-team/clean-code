@@ -9,7 +9,7 @@ class Args {
     private valid = true;
     private unexpectedArguments = new Set<string>();
     private booleanArgs = new Map<string, ArgumentMarshaler>();
-    private stringArgs = new Map<string, string>();
+    private stringArgs = new Map<string, ArgumentMarshaler>();
     private argsFound = new Set<string>();
     private currentArgument: number;
     private errorArgument = "\0";
@@ -59,7 +59,7 @@ class Args {
     }
 
     private parseStringSchemaElement(elementId: string) {
-        this.stringArgs.set(elementId, "");
+        this.stringArgs.set(elementId, new StringArgumentMarshaler());
     }
 
     private isStringSchemaElement(elementTail: string) {
@@ -125,7 +125,7 @@ class Args {
 
     public setStringArg(argChar: string, s: string) {
         this.currentArgument++;
-        this.stringArgs.set(argChar, this.args[this.currentArgument]);
+        this.stringArgs.get(argChar).setString(this.args[this.currentArgument])
     }
 
     public setBooleanArg(argChar: string, value: boolean) {
@@ -170,7 +170,8 @@ class Args {
     }
 
     public getString(arg: string) {
-        return this.stringArgs.get(arg) == null ? "" : this.stringArgs.get(arg);
+        const am = this.stringArgs.get(arg);
+        return am == null ? "" : am.getString();
     }
 
     public isValid() {
@@ -182,6 +183,7 @@ class Args {
 
 class ArgumentMarshaler {
     private booleanValue = false;
+    private stringValue: string;
 
     public setBoolean(value: boolean) {
         this.booleanValue = value;
@@ -189,6 +191,14 @@ class ArgumentMarshaler {
 
     public getBoolean() {
         return this.booleanValue;
+    }
+
+    public setString(s: string) {
+        this.stringValue = s;
+    }
+
+    public getString() {
+        return this.stringValue == null ? "" : this.stringValue;
     }
 }
 
