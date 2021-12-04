@@ -166,7 +166,7 @@ class Args {
 
     public getBoolean(arg: string) {
         const am = this.booleanArgs.get(arg);
-        return am != null && am.getBoolean();
+        return am != null && am.get();
     }
 
     public getString(arg: string) {
@@ -202,11 +202,15 @@ abstract class ArgumentMarshaler {
     }
 
     public abstract set(s: string): void;
+    public abstract get();
 }
 
 class BooleanArgumentMarshaler extends ArgumentMarshaler {
     public set(s: string) {
         this.booleanValue = true;
+    }
+    public get() {
+        return this.booleanValue;
     }
 }
 
