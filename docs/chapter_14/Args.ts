@@ -125,7 +125,7 @@ class Args {
 
     public setStringArg(argChar: string, s: string) {
         this.currentArgument++;
-        this.stringArgs.get(argChar).setString(this.args[this.currentArgument])
+        this.stringArgs.get(argChar).set(this.args[this.currentArgument])
     }
 
     public setBooleanArg(argChar: string, value: boolean) {
@@ -171,7 +171,7 @@ class Args {
 
     public getString(arg: string) {
         const am = this.stringArgs.get(arg);
-        return am == null ? "" : am.getString();
+        return am == null ? "" : am.get();
     }
 
     public isValid() {
@@ -182,30 +182,13 @@ class Args {
 }
 
 abstract class ArgumentMarshaler {
-    protected booleanValue = false;
-    private stringValue: string;
-
-    public setBoolean(value: boolean) {
-        this.booleanValue = value;
-    }
-
-    public getBoolean() {
-        return this.booleanValue;
-    }
-
-    public setString(s: string) {
-        this.stringValue = s;
-    }
-
-    public getString() {
-        return this.stringValue == null ? "" : this.stringValue;
-    }
-
     public abstract set(s: string): void;
     public abstract get();
 }
 
 class BooleanArgumentMarshaler extends ArgumentMarshaler {
+    private booleanValue = false;
+
     public set(s: string) {
         this.booleanValue = true;
     }
@@ -215,4 +198,12 @@ class BooleanArgumentMarshaler extends ArgumentMarshaler {
 }
 
 class StringArgumentMarshaler extends ArgumentMarshaler {
+    private stringValue = "";
+
+    public set(s: string) {
+        this.stringValue = s;
+    }
+    public get() {
+        return this.stringValue;
+    }
 }
