@@ -129,8 +129,7 @@ class Args {
     }
 
     public setBooleanArg(argChar: string, value: boolean) {
-        this.currentArgument++;
-        this.booleanArgs.set(argChar, this.args[this.currentArgument]);
+        this.booleanArgs.get(argChar).setBoolean(value);
     }
 
     public cardinality() {
@@ -166,11 +165,8 @@ class Args {
     }
 
     public getBoolean(arg: string) {
-        return this.falseIfNull(this.booleanArgs.get(arg).getBoolean());
-    }
-
-    private falseIfNull(b: boolean) {
-        return b == null ? false : b;
+        const am = this.booleanArgs.get(arg);
+        return am != null && am.getBoolean();
     }
 
     public getString(arg: string) {
