@@ -60,7 +60,9 @@ class Args {
     }
 
     private parseStringSchemaElement(elementId: string) {
-        this.marshalers.set(elementId, new StringArgumentMarshaler());
+        const m = new StringArgumentMarshaler();
+        this.stringArgs.set(elementId, new StringArgumentMarshaler());
+        this.marshalers.set(elementId, m);
     }
 
     private isStringSchemaElement(elementTail: string) {
@@ -72,7 +74,9 @@ class Args {
     }
 
     private parseBooleanSchemaElement(elementId: string) {
-        this.marshalers.set(elementId, new BooleanArgumentMarshaler());
+        const m = new BooleanArgumentMarshaler();
+        this.booleanArgs.set(elementId, new BooleanArgumentMarshaler());
+        this.marshalers.set(elementId, m);
     }
 
     private parseArguments() {
@@ -106,10 +110,10 @@ class Args {
 
     private setArgument(argChar: string) {
         const m = this.marshalers.get(argChar)
-        if (this.isBooleanArg(m)) {
-            this.setBooleanArg(argChar);
-        } else if (this.isStringArg(m)) {
-            this.setStringArg(argChar);
+        if (m instanceof BooleanArgumentMarshaler) {
+            this.setBooleanArg(m);
+        } else if (m instanceof StringArgumentMarshaler) {
+            this.setStringArg(m);
         } else {
             return false;
         }
@@ -124,13 +128,13 @@ class Args {
         return m instanceof BooleanArgumentMarshaler;
     }
 
-    public setStringArg(argChar: string) {
+    public setStringArg(m: ArgumentMarshaler) {
         this.currentArgument++;
-        this.stringArgs.get(argChar).set(this.args[this.currentArgument])
+        m.set(this.args[this.currentArgument])
     }
 
-    public setBooleanArg(argChar: string) {
-        this.booleanArgs.get(argChar).set("true");
+    public setBooleanArg(m: ArgumentMarshaler) {
+        m.set("true");
     }
 
     public cardinality() {
