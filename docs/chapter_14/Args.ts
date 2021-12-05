@@ -111,9 +111,9 @@ class Args {
     private setArgument(argChar: string) {
         const m = this.marshalers.get(argChar)
         if (this.isBooleanArg(m)) {
-            this.setBooleanArg(argChar, true);
+            this.setBooleanArg(argChar);
         } else if (this.isStringArg(m)) {
-            this.setStringArg(argChar, "");
+            this.setStringArg(argChar);
         } else {
             return false;
         }
@@ -128,12 +128,12 @@ class Args {
         return m instanceof BooleanArgumentMarshaler;
     }
 
-    public setStringArg(argChar: string, s: string) {
+    public setStringArg(argChar: string) {
         this.currentArgument++;
         this.stringArgs.get(argChar).set(this.args[this.currentArgument])
     }
 
-    public setBooleanArg(argChar: string, value: boolean) {
+    public setBooleanArg(argChar: string) {
         this.booleanArgs.get(argChar).set("true");
     }
 
