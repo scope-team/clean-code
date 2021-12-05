@@ -8,8 +8,6 @@ class Args {
     private args: string[];
     private valid = true;
     private unexpectedArguments = new Set<string>();
-    private booleanArgs = new Map<string, ArgumentMarshaler>();
-    private stringArgs = new Map<string, ArgumentMarshaler>();
     private marshalers = new Map<string, ArgumentMarshaler>();
     private argsFound = new Set<string>();
     private currentArgument: number;
@@ -61,7 +59,6 @@ class Args {
 
     private parseStringSchemaElement(elementId: string) {
         const m = new StringArgumentMarshaler();
-        this.stringArgs.set(elementId, new StringArgumentMarshaler());
         this.marshalers.set(elementId, m);
     }
 
@@ -75,7 +72,6 @@ class Args {
 
     private parseBooleanSchemaElement(elementId: string) {
         const m = new BooleanArgumentMarshaler();
-        this.booleanArgs.set(elementId, new BooleanArgumentMarshaler());
         this.marshalers.set(elementId, m);
     }
 
@@ -118,14 +114,6 @@ class Args {
             return false;
         }
         return true;
-    }
-
-    private isStringArg(m: ArgumentMarshaler) {
-        return m instanceof StringArgumentMarshaler
-    }
-
-    public isBooleanArg(m: ArgumentMarshaler) {
-        return m instanceof BooleanArgumentMarshaler;
     }
 
     public setStringArg(m: ArgumentMarshaler) {
