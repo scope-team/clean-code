@@ -60,9 +60,7 @@ class Args {
     }
 
     private parseStringSchemaElement(elementId: string) {
-        const m = new StringArgumentMarshaler();
-        this.stringArgs.set(elementId, new StringArgumentMarshaler());
-        this.marshalers.set(elementId, m);
+        this.marshalers.set(elementId, new StringArgumentMarshaler());
     }
 
     private isStringSchemaElement(elementTail: string) {
@@ -74,9 +72,7 @@ class Args {
     }
 
     private parseBooleanSchemaElement(elementId: string) {
-        const m = new BooleanArgumentMarshaler();
-        this.booleanArgs.set(elementId, new BooleanArgumentMarshaler());
-        this.marshalers.set(elementId, m);
+        this.marshalers.set(elementId, new BooleanArgumentMarshaler());
     }
 
     private parseArguments() {
