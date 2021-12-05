@@ -10,6 +10,7 @@ class Args {
     private unexpectedArguments = new Set<string>();
     private booleanArgs = new Map<string, ArgumentMarshaler>();
     private stringArgs = new Map<string, ArgumentMarshaler>();
+    private marshalers = new Map<string, ArgumentMarshaler>();
     private argsFound = new Set<string>();
     private currentArgument: number;
     private errorArgument = "\0";
@@ -59,7 +60,9 @@ class Args {
     }
 
     private parseStringSchemaElement(elementId: string) {
+        const m = new StringArgumentMarshaler();
         this.stringArgs.set(elementId, new StringArgumentMarshaler());
+        this.marshalers.set(elementId, m);
     }
 
     private isStringSchemaElement(elementTail: string) {
@@ -71,7 +74,9 @@ class Args {
     }
 
     private parseBooleanSchemaElement(elementId: string) {
+        const m = new BooleanArgumentMarshaler();
         this.booleanArgs.set(elementId, new BooleanArgumentMarshaler());
+        this.marshalers.set(elementId, m);
     }
 
     private parseArguments() {
@@ -104,7 +109,6 @@ class Args {
     }
 
     private setArgument(argChar: string) {
-        let set = true;
         if (this.isBoolean(argChar)) {
             this.setBooleanArg(argChar, true);
         } else if (this.isString(argChar)) {
@@ -116,11 +120,13 @@ class Args {
     }
 
     private isString(argChar: string) {
-        return this.stringArgs.has(argChar)
+        const m = this.marshalers.get(argChar)
+        return m instanceof StringArgumentMarshaler
     }
 
     public isBoolean(argChar: string) {
-        return this.booleanArgs.has(argChar);
+        const m = this.marshalers.get(argChar)
+        return m instanceof BooleanArgumentMarshaler;
     }
 
     public setStringArg(argChar: string, s: string) {
