@@ -166,12 +166,12 @@ class Args {
     }
 
     public getBoolean(arg: string) {
-        const am = this.booleanArgs.get(arg);
+        const am = this.marshalers.get(arg);
         return am != null && am.get();
     }
 
     public getString(arg: string) {
-        const am = this.stringArgs.get(arg);
+        const am = this.marshalers.get(arg);
         return am == null ? "" : am.get();
     }
 
