@@ -75,9 +75,16 @@ import Authors from "./Authors.tsx";
 
 ## 동기화하는 메서드 사이에 존재하는 의존성을 이해하라.
 
+- 동기화하는 메서드 사이에 의존성이 존재하면 동시성 코드에 찾아내기 어려운 버그가 생긴다. 고로 공유 객체 하나에는 메서드 하나만 사용하라.
+- 공유객체 하나에 여러 메서드가 필요하다면 '클라이언트에서의 잠금, 서버에서의 잠금, 연결서버'를 고려해야한다.
+
 ## 동기화하는 부분을 작게 만들어라
 
+- 임계영역은 반드시 보호해야하나 synchronized 문을 남발하면 스레드를 지연시키고 부하를 가중시키기 때문에 임계영역의 수를 최대한 줄여야 한다.
+
 ## 올바른 종료 코드는 구현하기 어렵다
+
+- 종료 코드를 개발 초기 부터 고민하고 동작하게 초기부터 구현하라. 생각보다 어려우므로 이미 나온 알고리즘을 검토하는 것이 좋다.
 
 ## 스레드 코드 테스트하기
 
@@ -89,7 +96,7 @@ import Authors from "./Authors.tsx";
 - 다른 플렛폼에서 돌려보라.
 - 코드에 보조 코드 (instrument)를 넣어 돌려라. 강제로 실패를 일으키게 해보라.
 
-## 타입스크립트에서의 동시성
+## 자바스크립트(타입스크립트 ver)에서의 동시성
 
 ### 프로미스 vs 콜백
 
@@ -163,6 +170,59 @@ downloadPage(
 | Promise.reject(error)  | 거부(reject)된 프로미스로 에러를 변환함.                                                                                  |
 | Promise.all(promises)  | 전달된 모든 프로미스가 이행한 값의 배열을 이행하는 새 프로미스 객체를 반환하거나 거부된 첫 번째 프로미스의 이유로 거부함. |
 | Promise.race(promises) | 전달된 프로미스의 배열에서 가장 먼저 완료된 결과/에러로 이행/거부된 새 프로미스 객체를 반환함.                            |
+
+### 프로미스보다 async/await가 더 명료
+
+async/await 구문을 사용하면 연결된 프로미스 구문보다 훨씬 더 명료하고 이해하기 쉬운 코드를 작성할 수 있다.
+async 키워드가 앞에 붙여진 함수는 await 키워드에서 코드의 실행을 멈춘다는 것을 자바스크립트 런타임에게 알려준다.
+
+Promise:
+
+```ts
+import { get } from "request";
+import { writeFile } from "fs";
+import { promisify } from "util";
+
+const write = util.promisify(writeFile);
+
+function downloadPage(url: string, saveTo: string): Promise<string> {
+  return get(url).then((response) => write(saveTo, response));
+}
+
+downloadPage(
+  "https://en.wikipedia.org/wiki/Robert_Cecil_Martin",
+  "article.html"
+)
+  .then((content) => console.log(content))
+  .catch((error) => console.error(error));
+```
+
+async/await:
+
+```ts
+import { get } from "request";
+import { writeFile } from "fs";
+import { promisify } from "util";
+
+const write = promisify(writeFile);
+
+async function downloadPage(url: string, saveTo: string): Promise<string> {
+  const response = await get(url);
+  await write(saveTo, response);
+  return response;
+}
+
+// somewhere in an async function
+try {
+  const content = await downloadPage(
+    "https://en.wikipedia.org/wiki/Robert_Cecil_Martin",
+    "article.html"
+  );
+  console.log(content);
+} catch (error) {
+  console.error(error);
+}
+```
 
 ## 결론
 
