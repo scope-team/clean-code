@@ -43,9 +43,9 @@ class Args {
         const elementTail = element.substring(1);
         this.validateSchemaElementId(elementId);
         if (this.isBooleanSchemaElement(elementTail)) {
-            this.parseBooleanSchemaElement(elementId);
+            this.marshalers.set(elementId, new BooleanArgumentMarshaler());
         } else if (this.isStringSchemaElement(elementTail)) {
-            this.parseStringSchemaElement(elementId);
+            this.marshalers.set(elementId, new BooleanArgumentMarshaler());
         }
     }
 
@@ -57,22 +57,12 @@ class Args {
         }
     }
 
-    private parseStringSchemaElement(elementId: string) {
-        const m = new StringArgumentMarshaler();
-        this.marshalers.set(elementId, m);
-    }
-
     private isStringSchemaElement(elementTail: string) {
         return elementTail === "*";
     }
 
     private isBooleanSchemaElement(elementTail: string) {
         return elementTail.length === 0;
-    }
-
-    private parseBooleanSchemaElement(elementId: string) {
-        const m = new BooleanArgumentMarshaler();
-        this.marshalers.set(elementId, m);
     }
 
     private parseArguments() {
