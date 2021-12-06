@@ -5,7 +5,7 @@
 - [positiveko](https://github.com/positiveko)
 - [Xednicoder](https://github.com/Xednicoder)
 - [gyuseok-dev](https://github.com/gyuseok-dev)
-- [shinyeong](https://github.com/shinyeong)
+- [shinyeong](https://github.com/bonbon0202)
 
 
 ## 📅 진행 기간
