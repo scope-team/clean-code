@@ -3,7 +3,7 @@
 
 ## 👨‍👩‍👧‍👦 참여자
 - [positiveko](https://github.com/positiveko)
-- [Xednicoder](https://github.com/Xednicoder)
+- [Ahn-Ryan](https://github.com/Ahn-Ryan)
 - [gyuseok-dev](https://github.com/gyuseok-dev)
 - [shinyeong](https://github.com/bonbon0202)
 
